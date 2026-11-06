@@ -72,8 +72,11 @@ def shap_explain(model, imgs: list[Image.Image], background: list[Image.Image]) 
     images = _tensor(model, imgs)
     reference = _tensor(model, background)
     with torch.enable_grad():
-        explainer = shap.GradientExplainer(model, reference)
-        values = explainer.shap_values(images)
+        explainer = shap.GradientExplainer(model, reference, batch_size=8)
+        # One image at a time with few samples keeps SHAP within 6 GB VRAM.
+        parts = [explainer.shap_values(images[i:i + 1], nsamples=50) for i in range(len(images))]
+        values = ([np.concatenate([p[k] for p in parts]) for k in range(len(parts[0]))]
+                  if isinstance(parts[0], list) else np.concatenate(parts))
     with torch.inference_mode():
         predicted = model(images).argmax(1).cpu().numpy()
     # Older SHAP: list of [N,C,H,W]. Newer SHAP: [N,C,H,W,outputs].
