@@ -55,11 +55,11 @@ def test_shap_normalized_inputs(monkeypatch):
         def forward(self, x):
             return x.mean((2, 3))[:, :2] + self.p
     class Explainer:
-        def __init__(self, model, background):
+        def __init__(self, model, background, **kwargs):
             assert not model.training
             assert background.shape == (1, 3, 224, 224)
             assert background.min() < 0
-        def shap_values(self, images):
+        def shap_values(self, images, **kwargs):
             return np.ones((*images.shape, 2))
     monkeypatch.setattr(shap, 'GradientExplainer', Explainer)
     maps = shap_explain(Tiny(), [Image.new('RGB', (3, 5))], [Image.new('RGB', (4, 2))])

@@ -34,15 +34,15 @@ def run_training(args, batch_size):
     backbone, head = [], []
     for name, param in model.named_parameters():
         (backbone if name.startswith(('cnn.', 'vit.')) else head).append(param)
-    optimizer = torch.optim.AdamW([{'params': backbone, 'lr': 1e-4},
+    optimizer = torch.optim.AdamW([{'params': backbone, 'lr': args.backbone_lr},
                                    {'params': head, 'lr': 3e-4}], weight_decay=.05)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
     counts = np.bincount(loaders['train'].dataset.df.label.to_numpy(dtype=int), minlength=args.classes)
     # A limited training subset can omit a class that still appears in val.
     weights = (counts.sum() / (args.classes * np.maximum(counts, 1))).astype(np.float32)
-    criterion = nn.CrossEntropyLoss(weight=torch.tensor(weights, device=device))
+    criterion = nn.CrossEntropyLoss(weight=torch.tensor(weights, device=device), label_smoothing=args.label_smoothing)
     scaler = torch.amp.GradScaler('cuda', enabled=device.type == 'cuda')
-    run_dir = RUNS_DIR / f'{args.mode}_{args.fusion}_c{args.classes}'
+    run_dir = RUNS_DIR / f'{args.mode}_{args.fusion}_c{args.classes}{args.tag}'
     run_dir.mkdir(parents=True, exist_ok=True)
     (run_dir / 'config.json').write_text(json.dumps({**vars(args), 'batch': batch_size, 'seed': SEED}, indent=2))
     history, best, stale = [], -1., 0
@@ -83,7 +83,7 @@ def run_training(args, batch_size):
         else:
             stale += 1
         scheduler.step()
-        if stale >= 4:
+        if stale >= args.patience:
             break
     return run_dir
 
@@ -96,6 +96,10 @@ def main(argv=None):
     parser.add_argument('--epochs', type=int, default=15)
     parser.add_argument('--batch', type=int, default=32)
     parser.add_argument('--limit', type=int)
+    parser.add_argument('--backbone-lr', type=float, default=1e-4)
+    parser.add_argument('--label-smoothing', type=float, default=0.0)
+    parser.add_argument('--patience', type=int, default=4)
+    parser.add_argument('--tag', default='', help='suffix for run name, e.g. _v2')
     args = parser.parse_args(argv)
     if not 1 <= args.epochs <= 15 or args.batch < 1 or (args.limit is not None and args.limit < 1):
         parser.error('epochs must be 1–15; batch and limit must be positive')
