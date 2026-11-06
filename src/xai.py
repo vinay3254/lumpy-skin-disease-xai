@@ -85,7 +85,9 @@ def shap_explain(model, imgs: list[Image.Image], background: list[Image.Image]) 
     else:
         values = np.asarray(values)
         selected = np.stack([values[i, ..., int(label)] for i, label in enumerate(predicted)]) if values.ndim == 5 else values
-    heatmaps = np.abs(selected).sum(axis=1)
+    from scipy.ndimage import gaussian_filter
+    # Smooth away the ViT 16x16 patch-grid artefact so regions read clearly.
+    heatmaps = [gaussian_filter(h, sigma=6) for h in np.abs(selected).sum(axis=1)]
     return [np.asarray(Image.fromarray(heat.astype(np.float32)).resize((IMG_SIZE, IMG_SIZE))) for heat in heatmaps]
 
 
@@ -136,7 +138,11 @@ def main(argv=None):
         fig, axes = plt.subplots(1, 4, figsize=(16, 4))
         panels = [_rgb(image), gradcam(model, image), lime_explain(model, image), heat]
         for ax, panel, title in zip(axes, panels, ['Original', 'Grad-CAM', 'LIME', 'SHAP']):
-            ax.imshow(panel, cmap='inferno' if title == 'SHAP' else None)
+            if title == 'SHAP':
+                ax.imshow(panels[0])
+                ax.imshow(panel, cmap='inferno', alpha=0.6)
+            else:
+                ax.imshow(panel)
             ax.set_title(title)
             ax.axis('off')
         fig.suptitle(f'True: {names[int(label)]} | Pred: {names[int(probs.argmax())]} ({probs.max():.1%})')
