@@ -144,12 +144,17 @@ def explain_shap(file: UploadFile = File(...), run: str = Form(...)):
     with gpu_lock:
         model, config = get_model(run)
         if run not in backgrounds:
-            df = pd.read_csv(SPLITS_CSV if config['classes'] == 2 else SPLITS_C3_CSV)
-            training = df[df['split'] == 'train'].sample(frac=1, random_state=SEED).head(20)
-            if training.empty:
+            splits = SPLITS_CSV if config['classes'] == 2 else SPLITS_C3_CSV
+            if splits.is_file():
+                df = pd.read_csv(splits)
+                paths = list(df[df['split'] == 'train'].sample(frac=1, random_state=SEED).head(20).path)
+            else:
+                # Fresh clone without the dataset: use the bundled background images.
+                paths = sorted((OUT_DIR / 'shap_background' / f"c{config['classes']}").glob('*'))
+            if not paths:
                 raise HTTPException(422, 'SHAP requires training images')
             images = []
-            for path in training.path:
+            for path in paths:
                 with Image.open(path) as reference:
                     images.append(reference.convert('RGB'))
             backgrounds[run] = images

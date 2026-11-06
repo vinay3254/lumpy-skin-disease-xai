@@ -26,10 +26,19 @@ uv pip install --python .venv/bin/python -r requirements.txt
 cd frontend && npm install && cd ..
 ```
 
-## 3. Data and training
+## 3. Trained models
 
-Trained model files (`best.pt`) are not in the repository because of their size.
-To rebuild them:
+Download the two trained models (about 80 MB) from the GitHub release:
+
+```bash
+./get_models.sh
+```
+
+This is enough to run the web app. The dataset is not needed.
+
+## 3b. Rebuilding data and models (optional)
+
+To retrain from scratch:
 
 ```bash
 .venv/bin/python -m src.download              # downloads about 430 MB from Kaggle

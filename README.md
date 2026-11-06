@@ -34,10 +34,11 @@ Reported numbers are therefore lower than leakage-prone results in literature.
 ## Web app
 
 ```bash
+./get_models.sh       # first time: download trained models (~80 MB)
 ./start.sh            # API on :8000, web app on http://localhost:5173
 ```
 
-First time: `cd frontend && npm install`. Pages: **Diagnose** (upload or sample
+First time also: create `.venv` from `requirements.txt` (see `report/User_Manual.md`) and run `cd frontend && npm install`. Pages: **Diagnose** (upload or sample
 image, binary / 3-class model, prediction with Grad-CAM, LIME and on-demand SHAP),
 **Results** (ablation table, charts, evaluation figures), **About** (pipeline,
 architecture, datasets).

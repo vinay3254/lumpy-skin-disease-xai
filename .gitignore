@@ -6,4 +6,3 @@ __pycache__/
 .venv/
 *.jpeg
 .playwright-mcp/
-outputs/samples/
