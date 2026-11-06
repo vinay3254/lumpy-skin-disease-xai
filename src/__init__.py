@@ -1,0 +1,1 @@
+"""Lumpy Skin Disease classification."""
