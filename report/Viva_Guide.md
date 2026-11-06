@@ -26,6 +26,23 @@
 | 8 | Open **Results** | "This is the ablation study: CNN only, ViT only, and two hybrid fusions, plus the 3-class model. The best model reaches 93.9% accuracy and 0.990 ROC-AUC." |
 | 9 | Select a run in the gallery | "Confusion matrix, ROC curve and training curves for each run." |
 
+### Which sample to click
+
+The sample strip shows 9 test images in this order. Results were checked on
+both models:
+
+| Sample | True class | 3-class model | Binary model |
+|---|---|---|---|
+| 1–3 | Healthy | Healthy (≥ 99.9%) | Healthy (92–97%) |
+| 4 | LSD | **Healthy (99.1%) — a miss** | LSD (96.3%) |
+| 5–6 | LSD | LSD (100%) | LSD (93–97%) |
+| 7–9 | Foot-and-mouth | Other (100%) | LSD (61–81%) — expected, binary has no "other" class |
+
+Use samples **5 or 6** for the LSD demo. Sample 4 is a good honest example if
+an examiner asks about errors: the 3-class model misses about 1 in 10 LSD
+images (LSD recall 0.90). Samples 7–9 on the binary model show why the 3-class
+model is needed: a binary model forces every skin disease into "LSD".
+
 ## 3. Key numbers
 
 | Item | Value |
