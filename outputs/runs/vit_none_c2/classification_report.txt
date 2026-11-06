@@ -1,0 +1,8 @@
+              precision    recall  f1-score   support
+
+     healthy       0.93      0.95      0.94       298
+         lsd       0.93      0.91      0.92       230
+
+    accuracy                           0.93       528
+   macro avg       0.93      0.93      0.93       528
+weighted avg       0.93      0.93      0.93       528

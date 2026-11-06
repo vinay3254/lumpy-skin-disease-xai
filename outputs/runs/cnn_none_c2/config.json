@@ -1,0 +1,9 @@
+{
+  "mode": "cnn",
+  "fusion": "none",
+  "classes": 2,
+  "epochs": 15,
+  "batch": 32,
+  "limit": null,
+  "seed": 42
+}

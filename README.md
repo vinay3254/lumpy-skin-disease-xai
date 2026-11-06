@@ -1,4 +1,42 @@
-# Lumpy Skin Disease classifier
+# LSD-XAI: Hybrid CNN–Transformer for Lumpy Skin Disease
+
+Explainable deep learning for detecting Lumpy Skin Disease (LSD) in cattle images.
+A hybrid network fuses local features from **EfficientNet-B0** (CNN) with global
+context from **DeiT-Tiny** (Vision Transformer), using concatenation or
+cross-attention fusion. Predictions are explained with **Grad-CAM, LIME and SHAP**,
+and served through a FastAPI backend and a React + TypeScript web app.
+
+## Results (held-out test set)
+
+| Model | Task | Accuracy | Macro F1 | ROC-AUC |
+|---|---|---|---|---|
+| Hybrid cross-attention | 3-class (Healthy / LSD / Foot-and-mouth) | **93.9%** | **0.945** | **0.990** |
+| CNN only (EfficientNet-B0) | Binary | 94.1% | 0.940 | 0.981 |
+| Hybrid concat (tuned) | Binary | 93.4% | 0.932 | 0.977 |
+| ViT only (DeiT-Tiny) | Binary | 93.4% | 0.932 | 0.980 |
+| Hybrid cross-attention (tuned) | Binary | 92.6% | 0.925 | 0.977 |
+
+Full ablation: `outputs/ablation.md`. Per-run metrics, confusion matrices, ROC and
+training curves: `outputs/runs/<run>/`. XAI figures: `outputs/xai/<run>/`.
+
+**Data:** 4,268 images from two Kaggle datasets
+(`warcoder/lumpy-skin-images-dataset`, `devang03mgr/cattle-diseases-datasets`).
+Near-duplicate images (pHash, Hamming distance ≤ 4) are grouped and each group is
+kept inside one split, so train/test leakage from augmented copies is prevented.
+Reported numbers are therefore lower than leakage-prone results in literature.
+
+## Web app
+
+```bash
+./start.sh            # API on :8000, web app on http://localhost:5173
+```
+
+First time: `cd frontend && npm install`. Pages: **Diagnose** (upload or sample
+image, binary / 3-class model, prediction with Grad-CAM, LIME and on-demand SHAP),
+**Results** (ablation table, charts, evaluation figures), **About** (pipeline,
+architecture, datasets).
+
+## Pipeline details
 
 EfficientNet-B0 and DeiT-Tiny combine local and global image features. The same
 model supports CNN-only, ViT-only, concatenation, and cross-attention ablations.

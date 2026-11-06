@@ -1,0 +1,13 @@
+{
+  "mode": "vit",
+  "fusion": "none",
+  "classes": 2,
+  "epochs": 15,
+  "batch": 32,
+  "limit": null,
+  "backbone_lr": 3e-05,
+  "label_smoothing": 0.1,
+  "patience": 6,
+  "tag": "_v2",
+  "seed": 42
+}

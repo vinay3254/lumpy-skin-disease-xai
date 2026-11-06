@@ -1,7 +1,10 @@
 data/
-outputs/runs/
+outputs/runs/**/*.pt
+outputs/logs/
 __pycache__/
 *.pyc
 .venv/
 *.jpeg
 docs/
+.playwright-mcp/
+outputs/samples/

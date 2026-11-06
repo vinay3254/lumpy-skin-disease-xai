@@ -68,6 +68,16 @@ def read_image(file):
         raise HTTPException(400, 'Invalid image') from None
 
 
+def shap_overlay(image, heat):
+    """Colour the SHAP heatmap (inferno) and blend it over the resized photo."""
+    from matplotlib import colormaps
+    heat = np.nan_to_num(np.asarray(heat, dtype=np.float64))
+    heat = (heat - heat.min()) / (heat.max() - heat.min() or 1)
+    colour = colormaps['inferno'](heat)[..., :3]
+    base = np.asarray(image.convert('RGB').resize(heat.shape[::-1]), dtype=np.float64) / 255
+    return (255 * (0.45 * base + 0.55 * colour)).astype(np.uint8)
+
+
 def png_url(pixels):
     pixels = np.asarray(pixels)
     if pixels.dtype != np.uint8:
@@ -144,7 +154,7 @@ def explain_shap(file: UploadFile = File(...), run: str = Form(...)):
                     images.append(reference.convert('RGB'))
             backgrounds[run] = images
         heat = shap_explain(model, [image], backgrounds[run])[0]
-        return {'shap': png_url(heat)}
+        return {'shap': png_url(shap_overlay(image, heat))}
 
 
 @app.get('/api/results')
