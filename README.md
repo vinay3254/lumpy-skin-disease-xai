@@ -25,6 +25,12 @@ Near-duplicate images (pHash, Hamming distance ≤ 4) are grouped and each group
 kept inside one split, so train/test leakage from augmented copies is prevented.
 Reported numbers are therefore lower than leakage-prone results in literature.
 
+## Documents
+
+- `report/Project_Report.md` (also `.docx` and `.pdf`): full project report
+- `report/Viva_Guide.md`: demo script and likely viva questions
+- `report/User_Manual.md`: installation, usage and troubleshooting
+
 ## Web app
 
 ```bash
