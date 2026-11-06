@@ -14,7 +14,7 @@ scikit-learn==1.9.1
 scipy==1.18.1
 shap==0.54.1
 timm==1.0.31
-torch==2.6.0
+torch==2.13.0
 torchvision==0.21.0
 tqdm==4.70.1
 uvicorn==0.54.0
